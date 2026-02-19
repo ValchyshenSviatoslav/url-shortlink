@@ -6,9 +6,9 @@
 
 ## Демонстрація
 Готовий сайт розгорнуто на GitHub Pages:
-**[Переглянути додаток ShortLink](https://valchyshensviatoslav.github.io/url-shortlink/index.html)**
+**(https://valchyshensviatoslav.github.io/url-shortlink/index.html)**
 
-## 🛠 Технології
+## Технології
 * **HTML5**
 * **CSS3** * **Bootstrap 5** (для швидкої розробки та адаптивності під мобільні пристрої)
 
@@ -21,4 +21,4 @@
 5. `about.html` — Сторінка з коротким описом та місією додатку.
 
 ---
-**Розробив:** Святослав Вальчишен (2026).
+**Розробив:** Святослав Вальчишен, студент групи КВ-34.
