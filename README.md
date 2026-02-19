@@ -5,7 +5,7 @@
 
 ## Демонстрація
 Готовий сайт розгорнуто на GitHub Pages:
-**https://valchyshensviatoslav.github.io/url-shortlink/index.html**
+**https://valchyshensviatoslav.github.io/url-shortlink/**
 
 ## Технології
 * **HTML5**
