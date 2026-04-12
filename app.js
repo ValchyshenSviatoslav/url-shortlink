@@ -1,6 +1,3 @@
-// ==========================================
-// MODEL (Модель)
-// ==========================================
 class LinkModel {
     constructor() {
         this.links = JSON.parse(localStorage.getItem('shortlinks')) || [];
@@ -19,7 +16,6 @@ class LinkModel {
         return newLink;
     }
 
-    // Видалення посилання за ID
     deleteLink(id) {
         this.links = this.links.filter(link => link.id !== id);
         this._commit(this.links);
@@ -30,12 +26,8 @@ class LinkModel {
     }
 }
 
-// ==========================================
-// VIEW (Представлення)
-// ==========================================
 class LinkView {
     constructor() {
-        // Елементи сторінки index.html
         this.urlInput = document.getElementById('urlInput');
         this.shortenBtn = document.getElementById('shortenBtn');
         this.resultCard = document.getElementById('resultCard');
@@ -43,7 +35,6 @@ class LinkView {
         this.originalUrlText = document.getElementById('originalUrlText');
         this.copyBtn = document.getElementById('copyBtn');
 
-        // Елементи сторінки profile.html
         this.tableBody = document.getElementById('linksTableBody');
     }
 
@@ -59,11 +50,10 @@ class LinkView {
         this.resultCard.style.display = 'block'; 
     }
 
-    // Відмалювати таблицю на сторінці профілю
     displayLinks(links) {
-        if (!this.tableBody) return; // Якщо ми не на сторінці профілю, ігноруємо
+        if (!this.tableBody) return;
         
-        this.tableBody.innerHTML = ''; // Очищаємо таблицю
+        this.tableBody.innerHTML = '';
 
         if (links.length === 0) {
             this.tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">У вас ще немає збережених посилань.</td></tr>';
@@ -114,7 +104,6 @@ class LinkView {
         }
     }
 
-    // Подія на клік кнопки "Видалити" в таблиці
     bindDeleteLink(handler) {
         if (this.tableBody) {
             this.tableBody.addEventListener('click', event => {
@@ -127,20 +116,15 @@ class LinkView {
     }
 }
 
-// ==========================================
-// CONTROLLER (Контролер)
-// ==========================================
 class LinkController {
     constructor(model, view) {
         this.model = model;
         this.view = view;
 
-        // Біндимо події
         this.view.bindShortenLink(this.handleShortenLink.bind(this));
         this.view.bindCopyLink();
         this.view.bindDeleteLink(this.handleDeleteLink.bind(this));
 
-        // Одразу відмальовуємо таблицю (якщо ми на profile.html)
         this.view.displayLinks(this.model.links);
     }
 
@@ -150,16 +134,112 @@ class LinkController {
         
         this.model.addLink(originalUrl, shortUrl);
         this.view.displayResult(shortUrl, originalUrl);
-        this.view.displayLinks(this.model.links); // Оновлюємо таблицю, якщо вона на екрані
+        this.view.displayLinks(this.model.links);
     }
 
     handleDeleteLink(id) {
         this.model.deleteLink(id);
-        this.view.displayLinks(this.model.links); // Перемальовуємо таблицю
+        this.view.displayLinks(this.model.links);
     }
 }
 
-// Ініціалізація
+class AuthModel {
+    constructor() {
+        this.users = JSON.parse(localStorage.getItem('users')) || [];
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    }
+
+    register(name, email, password) {
+        if (this.users.find(u => u.email === email)) return false; 
+        
+        const newUser = { id: Date.now(), name, email, password };
+        this.users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(this.users));
+        
+        this.currentUser = newUser;
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+        return true;
+    }
+
+    login(email, password) {
+        const user = this.users.find(u => u.email === email && u.password === password);
+        if (user) {
+            this.currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            return true;
+        }
+        return false;
+    }
+}
+
+class AuthView {
+    constructor() {
+        this.regName = document.getElementById('regName');
+        this.regEmail = document.getElementById('regEmail');
+        this.regPassword = document.getElementById('regPassword');
+        this.regBtn = document.getElementById('regBtn');
+
+        this.loginEmail = document.getElementById('loginEmail');
+        this.loginPassword = document.getElementById('loginPassword');
+        this.loginBtn = document.getElementById('loginBtn');
+    }
+
+    bindRegister(handler) {
+        if (this.regBtn) {
+            this.regBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (this.regName.value && this.regEmail.value && this.regPassword.value) {
+                    handler(this.regName.value, this.regEmail.value, this.regPassword.value);
+                } else {
+                    alert("Будь ласка, заповніть усі поля!");
+                }
+            });
+        }
+    }
+
+    bindLogin(handler) {
+        if (this.loginBtn) {
+            this.loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (this.loginEmail.value && this.loginPassword.value) {
+                    handler(this.loginEmail.value, this.loginPassword.value);
+                } else {
+                    alert("Введіть пошту та пароль!");
+                }
+            });
+        }
+    }
+}
+
+class AuthController {
+    constructor(model, view) {
+        this.model = model;
+        this.view = view;
+
+        this.view.bindRegister(this.handleRegister.bind(this));
+        this.view.bindLogin(this.handleLogin.bind(this));
+    }
+
+    handleRegister(name, email, password) {
+        if (this.model.register(name, email, password)) {
+            alert('Реєстрація успішна!');
+            window.location.href = 'profile.html';
+        } else {
+            alert('Користувач з такою поштою вже існує!');
+        }
+    }
+
+    handleLogin(email, password) {
+        if (this.model.login(email, password)) {
+            alert('Вхід успішний!');
+            window.location.href = 'profile.html';
+        } else {
+            alert('Невірна пошта або пароль!');
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const app = new LinkController(new LinkModel(), new LinkView());
+    const linkApp = new LinkController(new LinkModel(), new LinkView());
+    const authApp = new AuthController(new AuthModel(), new AuthView());
 });
